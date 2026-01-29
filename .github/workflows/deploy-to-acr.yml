@@ -22,7 +22,7 @@ on:
 
 env:
   REGISTRY_NAME: ${{ secrets.ACR_NAME }}
-  IMAGE_NAME: techworkshop-ai-app
+  IMAGE_NAME: chatapp
 
 permissions:
   contents: read
