@@ -209,7 +209,7 @@ resource appServiceApp 'Microsoft.Web/sites@2022-09-01' = {
         }
         {
           name: 'DOCKER_REGISTRY_SERVER_URL'
-          value: 'https://${containerRegistry.name}${environment().suffixes.acr}'
+          value: 'https://${containerRegistry.name}${environment().suffixes.acrLoginServer}'
         }
         {
           name: 'DOCKER_REGISTRY_SERVER_USERNAME'
