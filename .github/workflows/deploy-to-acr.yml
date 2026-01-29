@@ -24,6 +24,9 @@ env:
   REGISTRY_NAME: ${{ secrets.ACR_NAME }}
   IMAGE_NAME: techworkshop-ai-app
 
+permissions:
+  contents: read
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
