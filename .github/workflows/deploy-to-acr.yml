@@ -1,0 +1,57 @@
+# This workflow builds and deploys the application from the src/ folder to Azure Container Registry.
+# 
+# Required GitHub Secrets:
+#   - ACR_LOGIN_SERVER: The login server URL for your Azure Container Registry (e.g., myregistry.azurecr.io)
+#   - ACR_USERNAME: The username for ACR authentication
+#   - ACR_PASSWORD: The password for ACR authentication
+#   - ACR_NAME: The name of your Azure Container Registry
+#   - ENV: The contents of the .env file to be injected into the Docker image
+#
+# The ENV secret should contain all environment variables in the format:
+#   KEY1=value1
+#   KEY2=value2
+#   ...
+# This content will be written to a .env file inside the Docker image at build time.
+
+name: Deploy to Azure Container Registry
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY_NAME: ${{ secrets.ACR_NAME }}
+  IMAGE_NAME: techworkshop-ai-app
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Log in to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src
+          file: ./src/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+          build-args: |
+            ENV_CONTENT=${{ secrets.ENV }}
+          cache-from: type=registry,ref=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
