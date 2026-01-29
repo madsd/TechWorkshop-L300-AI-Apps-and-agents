@@ -54,6 +54,8 @@ out/
 *.azuredevops
 
 # Github
-.github/
+# Allow workflows but ignore other .github content
+.github/*
+!.github/workflows/
 parameters.json
 .azure
